@@ -311,6 +311,35 @@
                         })
                         .catch(error => console.error('Error cancelling reservation:', error));
                     }
+
+
+                    document.addEventListener("DOMContentLoaded", function() {
+                        // 初回読み込み時の予約情報取得
+                        updateSeatStatus();
+
+                        // 5秒ごとに予約情報を更新（ポーリング）
+                        setInterval(updateSeatStatus, 5000);
+                    });
+
+                            function updateSeatStatus() {
+                                fetch('https://attend-manage.vercel.app/reservations')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        document.querySelectorAll('.seat').forEach(seat => {
+                                            const seatText = seat.dataset.originalText;
+                                            if (data[seatText]) {
+                                                seat.classList.add('reserved');
+                                                seat.textContent = '予約済み';
+                                                seat.dataset.reservedBy = data[seatText].userId;
+                                            } else {
+                                                seat.classList.remove('reserved');
+                                                seat.textContent = seat.dataset.originalText;
+                                                delete seat.dataset.reservedBy;
+                                            }
+                                        });
+                                    })
+                                    .catch(error => console.error('Error fetching reservation data:', error));
+                            }
             </script>
 
         </div>

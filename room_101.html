@@ -20,22 +20,17 @@
         .newSeatMainContainer {
             display: flex;
             justify-content: center;
-            overflow-x: auto; /* 横スクロールを許可 */
-            padding-bottom: 10px; /* スクロールバーとの距離を少し確保 */
+            overflow-x: auto;
+            padding-bottom: 10px;
             gap: 20px;
             margin-bottom: 20px;
         }
-
         .newSeatContainer {
             display: grid;
             grid-template-columns: repeat(3, 60px);
             grid-template-rows: repeat(15, 40px);
             gap: 5px;
         }
-
-
-
-       
         .seat {
             width: 60px;
             height: 40px;
@@ -48,32 +43,19 @@
             font-size: 14px;
             color: white;
             border-radius: 5px;
-            transition: background-color 0.3s; /* 背景色の変化をスムーズに */
+            transition: background-color 0.3s;
         }
         .seat.reserved {
             background-color: #f44336;
             cursor: not-allowed;
-        }
-        /* 3列ごとに区切りを作成 */
-        .seat:nth-child(3n) {
-            margin-right: 20px;
-        }
-        /* 各行の最後の座席のマージンをリセット */
-        .seat:nth-child(12n) {
-            margin-right: 0;
-        }
-        /* フォントサイズの調整 */
-        label, button {
-            font-size: 18px; /* ラベルとボタンのフォントサイズを18pxに設定 */
-            margin: 10px 0; /* 上下のマージンを追加 */
         }
         input {
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            width: calc(100% - 22px); /* 幅を調整 */
-            margin-bottom: 15px; /* 下のマージンを追加 */
+            width: calc(100% - 22px);
+            margin-bottom: 15px;
         }
         button {
             padding: 10px 20px;
@@ -86,7 +68,7 @@
             transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #0056b3; /* ホバー時の色 */
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -108,241 +90,114 @@
             <div class="newSeatContainer"></div>
             <div class="newSeatContainer"></div>
             <div class="newSeatContainer"></div>
-            <!-- 座席の生成 -->
-            <script>
-                // JavaScriptで座席を生成
-                const seatContainers = document.querySelectorAll('.newSeatContainer');
-                const rows = 15;
-                const columns = 3;
+        </div>
 
-                // 各列コンテナに15行3列の席を生成
-                seatContainers.forEach((seatContainer, index) => {
-                    for (let row = 1; row <= rows; row++) {
-                        for (let col = 1; col <= columns; col++) {
-                            const seat = document.createElement('div');
-                            seat.classList.add('seat');
-                            seat.textContent = String.fromCharCode(64 + row) + col + (index * columns);
-                            seat.onclick = function() { toggleSeatStatus(seat); };
-                            seatContainer.appendChild(seat);
-                        }
-                    }
-                });
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // 初回読み込み時に予約情報を取得
+                updateSeatStatus();
 
+                // 5秒ごとに予約情報を更新（ポーリング）
+                setInterval(updateSeatStatus, 5000);
+            });
 
-
-
-                
-
-                // ユーザーごとの予約とパスワードを管理するオブジェクト
-                const userReservations = {};
-
-                function toggleSeatStatus(seat) {
-                    const userIdInput = document.getElementById('userId');
-                    const passwordInput = document.getElementById('password');
-                    const userId = userIdInput.value.trim();
-                    const password = passwordInput.value.trim();
-                    
-                    if (!userId || !password) {
-                        alert("学籍番号とパスワードを入力してください。");
-                        return;
-                    }
-
-                    // 既にユーザーが別の座席を予約している場合、新しい予約は許可しない
-                    if (!seat.classList.contains('reserved') && userReservations[userId] && userReservations[userId].seat !== seat) {
-                        alert("一度に予約できる座席は1つだけです。現在の予約を解除してください。");
-                        return;
-                    }
-
-                    // 予約済みの場合
-                    if (seat.classList.contains('reserved')) {
-                        const reservedBy = seat.dataset.reservedBy;
-                        const reservedPassword = seat.dataset.reservedPassword;
-                        if (reservedBy !== userId || reservedPassword !== password) {
-                            alert("この座席は他のユーザーによって予約されています。またはパスワードが違います。");
-                            return;
-                        } else {
-                            // 予約を解除
-                            seat.classList.remove('reserved');
-                            seat.textContent = seat.dataset.originalText;
-                            delete seat.dataset.reservedBy;
-                            delete seat.dataset.reservedPassword;
-                            delete userReservations[userId];
-                            alert("予約を解除しました。");
-                        }
-                    } else {
-                        // 新規予約
-                        seat.classList.add('reserved');
-                        seat.dataset.reservedBy = userId;
-                        seat.dataset.reservedPassword = password;
-                        seat.textContent = '予約済み';
-                        userReservations[userId] = { seat: seat, password: password };
-                        alert("予約が完了しました。");
-                    }
-                }
-
-                // 初期テキストを保持するための設定
-                document.querySelectorAll('.seat').forEach(function(seat) {
-                    seat.dataset.originalText = seat.textContent;
-                });
-
-                // 自分の予約座席を表示する関数
-                function showMyReservations() {
-                    const userId = document.getElementById('userId').value.trim();
-                    const password = document.getElementById('password').value.trim();
-                    if (!userId || !password) {
-                        alert("学籍番号とパスワードを入力してください。");
-                        return;
-                    }
-
-                    const reservation = userReservations[userId];
-                    if (reservation && reservation.password === password) {
-                        alert("あなたの予約座席: " + reservation.seat.dataset.originalText);
-                    } else {
-                        alert("現在、あなたが予約した座席はありません。またはパスワードが間違っています。");
-                    }
-                }
-
-                // 予約を自動的に解除する関数
-                function autoReleaseReservations() {
-                    const currentTime = new Date();
-                    const targetHour = 18; // 解除する時間（午後6時）
-                    const targetMinute = 0; // 解除する分（0分）
-
-                    // 現在の時間が午後6時になった場合
-                    if (currentTime.getHours() === targetHour && currentTime.getMinutes() === targetMinute) {
-                        // 全ての座席を解除
-                        document.querySelectorAll('.seat.reserved').forEach(seat => {
-                            seat.classList.remove('reserved');
-                            seat.textContent = seat.dataset.originalText;
-                            const reservedBy = seat.dataset.reservedBy;
-                            delete seat.dataset.reservedBy;
-                            delete seat.dataset.reservedPassword;
-                            delete userReservations[reservedBy];
-                        });
-                        alert("全ての予約が解除されました。");
-                    }
-                }
-
-
-                
-                // 定期的に予約解除をチェック
-                setInterval(autoReleaseReservations, 60000); // 1分ごとにチェック
-            </script>
-            //以下のスクリプト追加したやつ
-            <script>
-               // ページ読み込み時に予約情報を取得して表示する
-                    document.addEventListener("DOMContentLoaded", function() {
-                        fetch('https://attend-manage.vercel.app/reservations')
-                            .then(response => response.json())
-                            .then(data => {
-                                document.querySelectorAll('.seat').forEach(seat => {
-                                    const seatText = seat.dataset.originalText;
-                                    if (data[seatText]) {
-                                        seat.classList.add('reserved');
-                                        seat.textContent = '予約済み';
-                                        seat.dataset.reservedBy = data[seatText].userId;
-                                    }
-                                });
-                            })
-                            .catch(error => console.error('Error fetching reservation data:', error));
-                    });
-
-                    function reserveSeat(seat) {
-                        const userId = document.getElementById('userId').value.trim();
-                        const password = document.getElementById('password').value.trim();
-
-                        if (!userId || !password) {
-                            alert("学籍番号とパスワードを入力してください。");
-                            return;
-                        }
-
-                        if (seat.classList.contains('reserved')) {
-                            alert("この座席は既に予約されています。");
-                            return;
-                        }
-
-                        const seatText = seat.dataset.originalText;
-                        fetch('https://attend-manage.vercel.app/reserve', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ userId, password, seat: seatText })
-                        })
-                        .then(response => response.json().then(data => ({ ok: response.ok, body: data })))
-                        .then(data => {
-                            if (data.ok) {
+            function updateSeatStatus() {
+                fetch('https://attend-manage.vercel.app/reservations')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.querySelectorAll('.seat').forEach(seat => {
+                            const seatText = seat.dataset.originalText;
+                            if (data[seatText]) {
                                 seat.classList.add('reserved');
                                 seat.textContent = '予約済み';
-                                alert(data.body.message);
+                                seat.dataset.reservedBy = data[seatText].userId;
                             } else {
-                                alert(data.body.message);
-                            }
-                        })
-                        .catch(error => console.error('Error making reservation:', error));
-                    }
-
-                    function cancelReservation(seat) {
-                        const userId = document.getElementById('userId').value.trim();
-                        const password = document.getElementById('password').value.trim();
-
-                        if (!userId || !password) {
-                            alert("学籍番号とパスワードを入力してください。");
-                            return;
-                        }
-
-                        const seatText = seat.dataset.originalText;
-                        fetch('https://attend-manage.vercel.app/cancel', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ userId, password, seat: seatText })
-                        })
-                        .then(response => response.json().then(data => ({ ok: response.ok, body: data })))
-                        .then(data => {
-                            if (data.ok) {
                                 seat.classList.remove('reserved');
                                 seat.textContent = seat.dataset.originalText;
-                                alert(data.body.message);
-                            } else {
-                                alert(data.body.message);
+                                delete seat.dataset.reservedBy;
                             }
-                        })
-                        .catch(error => console.error('Error cancelling reservation:', error));
+                        });
+                    })
+                    .catch(error => console.error('Error fetching reservation data:', error));
+            }
+
+            const seatContainers = document.querySelectorAll('.newSeatContainer');
+            const rows = 15;
+            const columns = 3;
+
+            seatContainers.forEach((seatContainer, index) => {
+                for (let row = 1; row <= rows; row++) {
+                    for (let col = 1; col <= columns; col++) {
+                        const seat = document.createElement('div');
+                        seat.classList.add('seat');
+                        seat.textContent = String.fromCharCode(64 + row) + col + (index * columns);
+                        seat.onclick = function() { reserveSeat(seat); };
+                        seatContainer.appendChild(seat);
                     }
+                }
+            });
 
+            document.querySelectorAll('.seat').forEach(seat => {
+                seat.dataset.originalText = seat.textContent;
+            });
 
-                    document.addEventListener("DOMContentLoaded", function() {
-                        // 初回読み込み時の予約情報取得
-                        updateSeatStatus();
+            function reserveSeat(seat) {
+                const userId = document.getElementById('userId').value.trim();
+                const password = document.getElementById('password').value.trim();
 
-                        // 5秒ごとに予約情報を更新（ポーリング）
-                        setInterval(updateSeatStatus, 5000);
-                    });
+                if (!userId || !password) {
+                    alert("学籍番号とパスワードを入力してください。");
+                    return;
+                }
 
-                            function updateSeatStatus() {
-                                fetch('https://attend-manage.vercel.app/reservations')
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        document.querySelectorAll('.seat').forEach(seat => {
-                                            const seatText = seat.dataset.originalText;
-                                            if (data[seatText]) {
-                                                seat.classList.add('reserved');
-                                                seat.textContent = '予約済み';
-                                                seat.dataset.reservedBy = data[seatText].userId;
-                                            } else {
-                                                seat.classList.remove('reserved');
-                                                seat.textContent = seat.dataset.originalText;
-                                                delete seat.dataset.reservedBy;
-                                            }
-                                        });
-                                    })
-                                    .catch(error => console.error('Error fetching reservation data:', error));
-                            }
-            </script>
+                if (seat.classList.contains('reserved')) {
+                    alert("この座席は既に予約されています。");
+                    return;
+                }
 
-        </div>
+                const seatText = seat.dataset.originalText;
+                fetch('https://attend-manage.vercel.app/reserve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, password, seat: seatText })
+                })
+                .then(response => response.json().then(data => ({ ok: response.ok, body: data })))
+                .then(data => {
+                    if (data.ok) {
+                        seat.classList.add('reserved');
+                        seat.textContent = '予約済み';
+                        alert(data.body.message);
+                    } else {
+                        alert(data.body.message);
+                    }
+                })
+                .catch(error => console.error('Error making reservation:', error));
+            }
+
+            function showMyReservations() {
+                const userId = document.getElementById('userId').value.trim();
+                const password = document.getElementById('password').value.trim();
+
+                if (!userId || !password) {
+                    alert("学籍番号とパスワードを入力してください。");
+                    return;
+                }
+
+                fetch('https://attend-manage.vercel.app/reservations')
+                    .then(response => response.json())
+                    .then(data => {
+                        const reservation = Object.entries(data).find(([seat, res]) => res.userId === userId && res.password === password);
+                        if (reservation) {
+                            alert("あなたの予約座席: " + reservation[0]);
+                        } else {
+                            alert("現在、あなたが予約した座席はありません。またはパスワードが間違っています。");
+                        }
+                    })
+                    .catch(error => console.error('Error showing reservations:', error));
+            }
+        </script>
     </div>
 </body>
 </html>

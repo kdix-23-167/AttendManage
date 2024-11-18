@@ -232,7 +232,7 @@
             <script>
                // ページ読み込み時に予約情報を取得して表示する
                     document.addEventListener("DOMContentLoaded", function() {
-                        fetch('attend-manage.vercel.app')
+                        fetch('https://attend-manage.vercel.app')
                             .then(response => response.json())
                             .then(data => {
                                 document.querySelectorAll('.seat').forEach(seat => {
@@ -258,7 +258,7 @@
                         }
 
                         const seatText = seat.dataset.originalText;
-                        fetch('attend-manage.vercel.app', {
+                        fetch('https://attend-manage.vercel.app', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -289,7 +289,7 @@
                         }
 
                         const seatText = seat.dataset.originalText;
-                        fetch('attend-manage.vercel.app', {
+                        fetch('https://attend-manage.vercel.app', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'

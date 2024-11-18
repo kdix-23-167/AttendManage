@@ -91,11 +91,10 @@
             <div class="newSeatContainer"></div>
             <div class="newSeatContainer"></div>
         </div>
-        
+
         <script>
-            // ページ読み込み時に予約情報を取得して表示する
             document.addEventListener("DOMContentLoaded", function() {
-                fetch('https://attend-manage.vercel.app/')
+                fetch('https://attend-manage.vercel.app/reservations')
                     .then(response => response.json())
                     .then(data => {
                         document.querySelectorAll('.seat').forEach(seat => {
@@ -110,7 +109,6 @@
                     .catch(error => console.error('Error fetching reservation data:', error));
             });
 
-            // 座席を生成するコード
             const seatContainers = document.querySelectorAll('.newSeatContainer');
             const rows = 15;
             const columns = 3;
@@ -134,14 +132,19 @@
             function reserveSeat(seat) {
                 const userId = document.getElementById('userId').value.trim();
                 const password = document.getElementById('password').value.trim();
-                
+
                 if (!userId || !password) {
                     alert("学籍番号とパスワードを入力してください。");
                     return;
                 }
 
+                if (seat.classList.contains('reserved')) {
+                    alert("この座席は既に予約されています。");
+                    return;
+                }
+
                 const seatText = seat.dataset.originalText;
-                fetch('https://attend-manage.vercel.app/', {
+                fetch('https://attend-manage.vercel.app/reserve', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -164,18 +167,18 @@
             function showMyReservations() {
                 const userId = document.getElementById('userId').value.trim();
                 const password = document.getElementById('password').value.trim();
-                
+
                 if (!userId || !password) {
                     alert("学籍番号とパスワードを入力してください。");
                     return;
                 }
 
-                fetch('https://attend-manage.vercel.app/')
+                fetch('https://attend-manage.vercel.app/reservations')
                     .then(response => response.json())
                     .then(data => {
-                        const reservation = Object.values(data).find(res => res.userId === userId && res.password === password);
+                        const reservation = Object.entries(data).find(([seat, res]) => res.userId === userId && res.password === password);
                         if (reservation) {
-                            alert("あなたの予約座席: " + reservation.seat);
+                            alert("あなたの予約座席: " + reservation[0]);
                         } else {
                             alert("現在、あなたが予約した座席はありません。またはパスワードが間違っています。");
                         }

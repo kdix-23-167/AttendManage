@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選択画面</title>
+    <style>
+        /* 全体の背景とフォントスタイル */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e9ecef; /* 背景色 */
+            display: flex;
+            justify-content: center; /* 中央に配置 */
+            align-items: center; /* 中央に配置 */
+            height: 100vh; /* ビューポートの高さを100% */
+            margin: 0; /* デフォルトのマージンをリセット */
+        }
+
+        /* コンテナのスタイル */
+        .container {
+            text-align: center; /* テキストを中央に配置 */
+            background-color: #ffffff; /* コンテナの背景色 */
+            padding: 40px; /* 内側の余白 */
+            border-radius: 10px; /* 角を丸く */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 影をつける */
+        }
+
+        /* タイトルのスタイル */
+        h1 {
+            font-size: 28px; /* フォントサイズ */
+            margin-bottom: 20px; /* 下のマージン */
+            color: #333; /* フォントカラー */
+        }
+
+        /* ボタンのスタイル */
+        button {
+            font-size: 20px; /* ボタン内のテキストのサイズ */
+            padding: 15px 30px; /* ボタンの内側の余白 */
+            margin: 10px; /* ボタン間のスペース */
+            border: none; /* 枠線を消す */
+            border-radius: 5px; /* 角を丸く */
+            background-color: #007BFF; /* ボタンの背景色 */
+            color: white; /* テキストの色 */
+            cursor: pointer; /* ポインタを指に変更 */
+            transition: background-color 0.3s; /* ホバー時の変化をスムーズに */
+        }
+
+        /* ボタンをホバーしたときのスタイル */
+        button:hover {
+            background-color: #0056b3; /* ホバー時の背景色 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>どちらのページにアクセスしますか？</h1>
+        <button onclick="window.location.href='student_roomset.html'">生徒用ページ</button>
+        <button onclick="window.location.href='teacher.html'">先生用ページ</button>
+    </div>
+</body>
+</html>

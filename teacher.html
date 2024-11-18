@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教室予約アプリ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 350px; /* Adjusted width for a more spacious layout */
+            transition: transform 0.2s; /* Smooth hover effect */
+        }
+
+        .container:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333; /* Darker color for better contrast */
+            margin-bottom: 20px; /* Space between title and form */
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555; /* Softer color for labels */
+            font-weight: bold; /* Make labels stand out */
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 10px; /* Increased padding for comfort */
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 5px; /* Slightly rounded corners */
+            border: 1px solid #ccc;
+            font-size: 16px; /* Increased font size for readability */
+        }
+
+        select:focus, input:focus {
+            border-color: #4CAF50; /* Highlight on focus */
+            outline: none; /* Remove default outline */
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold; /* Make button text stand out */
+            transition: background-color 0.3s; /* Smooth transition for hover */
+        }
+
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        #errorMessage, #confirmationMessage {
+            text-align: center; /* Center messages for better visibility */
+        }
+
+        #errorMessage {
+            color: red; /* Error message color */
+            font-weight: bold; 
+        }
+
+        #confirmationMessage {
+            color: green; /* Confirmation message color */
+            font-weight: bold; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>教室予約</h2>
+        <form id="reservationForm">
+            <label for="teacherName">先生の名前:</label>
+            <input type="text" id="teacherName" name="teacherName" required>
+
+            <label for="roomNumber">教室番号:</label>
+            <select id="roomNumber" name="roomNumber" required>
+                <option value="">選択してください</option>
+                <option value="101">101</option>
+                <option value="102">102</option>
+                <option value="103">103</option>
+                <option value="104">104</option>
+                <option value="105">105</option>
+                <option value="106">106</option>
+                <option value="107">107</option>
+                <option value="108">108</option>
+                <option value="201">201</option>
+                <option value="202">202</option>
+                <option value="203">203</option>
+                <option value="204">204</option>
+                <option value="205">205</option>
+                <option value="206">206</option>
+                <option value="207">207</option>
+                <option value="208">208</option>
+            </select>
+
+            <label for="date">日付:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="period">時間割:</label>
+            <select id="period" name="period" required>
+                <option value="">選択してください</option>
+                <option value="1">1限</option>
+                <option value="2">2限</option>
+                <option value="3">3限</option>
+                <option value="4">4限</option>
+                <option value="5">5限</option>
+                <option value="6">6限</option>
+            </select>
+
+            <button type="button" onclick="reserveRoom()">予約する</button>
+            <button type="button" onclick="showMyReservations()">自分の予約を確認</button>
+        </form>
+        <p id="confirmationMessage" style="display: none;"></p>
+        <p id="errorMessage" style="display: none;"></p>
+    </div>
+
+    <script>
+        // 予約情報を保持する配列
+        const reservations = [];
+
+        function reserveRoom() {
+            const teacherName = document.getElementById('teacherName').value;
+            const roomNumber = document.getElementById('roomNumber').value;
+            const date = document.getElementById('date').value;
+            const period = document.getElementById('period').value;
+
+            // 全てのフィールドが入力されているか確認
+            if (teacherName && roomNumber && date && period) {
+                // 同じ日、同じ教室、同じ時間割に予約がないか確認
+                const existingReservation = reservations.find(reservation => 
+                    reservation.roomNumber === roomNumber &&
+                    reservation.date === date &&
+                    reservation.period === period
+                );
+
+                if (existingReservation) {
+                    // 重複する予約がある場合
+                    document.getElementById('errorMessage').textContent = `教室 ${roomNumber} は ${date} の ${period}限 に既に予約されています。`;
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('confirmationMessage').style.display = 'none';
+                } else {
+                    // 予約を配列に追加
+                    reservations.push({ teacherName, roomNumber, date, period });
+                    const message = `${teacherName} 先生が教室 ${roomNumber} を ${date} の ${period}限 に予約しました。`;
+                    document.getElementById('confirmationMessage').textContent = message;
+                    document.getElementById('confirmationMessage').style.display = 'block';
+                    document.getElementById('errorMessage').style.display = 'none';
+                }
+            } else {
+                alert("全てのフィールドを入力してください。");
+            }
+        }
+
+        function showMyReservations() {
+            if (reservations.length === 0) {
+                alert("現在、予約はありません。");
+                return;
+            }
+
+            // 予約情報を文字列として整形
+            const reservationDetails = reservations.map(reservation => 
+                `${reservation.teacherName} 先生が教室 ${reservation.roomNumber} を ${reservation.date} の ${reservation.period}限 に予約しています。`
+            ).join('\n');
+
+            alert(`あなたの予約:\n${reservationDetails}`);
+        }
+    </script>
+</body>
+</html>

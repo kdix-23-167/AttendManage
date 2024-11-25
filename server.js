@@ -8,8 +8,7 @@ app.use(cors());
 
 let reservations = {};
 
-// メモリ内で予約情報を保持するオブジェクト（本番環境ではデータベースの使用を推奨）
-const reservations = {};
+
 
 // 予約の作成エンドポイント
 app.post('/reserve', (req, res) => {

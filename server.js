@@ -46,7 +46,7 @@ app.get('/reservations', (req, res) => {
 // サーバーの起動
 const port = 3000;
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${port}`);
 });
 
 

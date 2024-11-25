@@ -33,7 +33,7 @@ app.post('/cancel', (req, res) => {
 
 // 予約情報を取得するエンドポイント
 app.get('/reservations', (req, res) => {
-    res.status(200).json(reservations);
+    res.json(reservations);
 });
 
 // サーバーの起動

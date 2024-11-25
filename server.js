@@ -6,18 +6,26 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+let reservations = {};
+
 // メモリ内で予約情報を保持するオブジェクト（本番環境ではデータベースの使用を推奨）
 const reservations = {};
 
 // 予約の作成エンドポイント
 app.post('/reserve', (req, res) => {
     const { userId, password, seat } = req.body;
-    if (!reservations[seat]) {
-        reservations[seat] = { userId, password };
-        res.status(200).json({ message: "予約が完了しました。" });
-    } else {
-        res.status(400).json({ message: "この座席は既に予約されています。" });
+    if (!userId || !password || !seat) {
+        return res.status(400).json({ message: "すべてのフィールドを入力してください。" });
     }
+
+    // 既に座席が予約されている場合
+    if (reservations[seat]) {
+        return res.status(400).json({ message: "この座席は既に予約されています。" });
+    }
+
+    // 新しい予約を作成
+    reservations[seat] = { userId, password };
+    return res.status(200).json({ message: "予約が完了しました。" });
 });
 
 // 予約のキャンセルエンドポイント
@@ -39,7 +47,7 @@ app.get('/reservations', (req, res) => {
 // サーバーの起動
 const port = 3000;
 app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
 
 

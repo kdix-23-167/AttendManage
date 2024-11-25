@@ -165,6 +165,8 @@
                 })
                 .then(response => response.json().then(data => ({ ok: response.ok, body: data })))
                 .then(data => {
+                    console.log("Reservation response:", data);
+
                     if (data.ok) {
                         seat.classList.add('reserved');
                         seat.textContent = '予約済み';

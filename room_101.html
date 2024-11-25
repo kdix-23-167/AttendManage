@@ -102,7 +102,7 @@
             });
 
             function updateSeatStatus() {
-                fetch('https://attend-manage.vercel.app/reservations')
+                fetch('https://attend-manage.vercel.app')
                     .then(response => response.json())
                     .then(data => {
                         document.querySelectorAll('.seat').forEach(seat => {
@@ -156,7 +156,7 @@
                 }
 
                 const seatText = seat.dataset.originalText;
-                fetch('https://attend-manage.vercel.app/reserve', {
+                fetch('https://attend-manage.vercel.app', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -187,7 +187,7 @@
                     return;
                 }
 
-                fetch('https://attend-manage.vercel.app/reservations')
+                fetch('https://attend-manage.vercel.app')
                     .then(response => response.json())
                     .then(data => {
                         const reservation = Object.entries(data).find(([seat, res]) => res.userId === userId && res.password === password);
